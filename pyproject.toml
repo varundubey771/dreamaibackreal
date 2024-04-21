@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "dreamai-bacc"
+version = "0.1.0"
+description = ""
+authors = ["varundubey771 <varundubey771@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<=3.13"
+crewai = {extras = ["tools"], version = "^0.22.4"}
+pydantic = "^2.6.3"
+load-dotenv = "^0.1.0"
+crewai-tools = "^0.0.15"
+flask = "^3.0.2"
+flask-cors = "^4.0.0"
+pycryptodome = "^3.20.0"
+supabase = "^2.4.3"
+groq = "^0.5.0"
+langchain-groq = "^0.1.2"
+langchain-community = "^0.0.34"
+langchain = ">=0.1.16, <0.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
