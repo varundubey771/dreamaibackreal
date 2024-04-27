@@ -96,4 +96,5 @@ obj
     print(obj)
     return {"analysis":chat_completion.choices[0].message.content}
 
-app.run(debug=True)
+if __name__=='__main__':
+    app.run(debug=True, port=8001)
