@@ -28,7 +28,7 @@ class DreamAnalysisTasks:
                 """),
             agent=agent,
             expected_output=dedent(
-                """A json object containing the list of at most 6 symbols in the key symbols"""),
+                """A json object containing the list of 3 most symbols in the key symbols"""),
             output_json=DreamSymbolList,
             callback=self.appendEventCallback
         )

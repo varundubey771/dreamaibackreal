@@ -28,11 +28,11 @@ class DreamAnalysisAgents:
     def symbolExtarctorAgent(self, dream:str) -> Agent:
         return Agent(
             role="Jungian Symbols Indentification Expert",
-            goal=f"""Generate a List of jungian symbols present in the following dream.
+            goal=f"""Generate a List of 3 most relevant jungian symbols present in the following dream.
 
                 Dream: {dream}
                 Important:
-                - The final list must include only the relevant jungian symbols and nothing their meaning..
+                - The final list must include only top 3 relevant jungian symbols and nottheir meaning..
                 - Do not generate fake information. Only return the information you find. Nothing else!
                 - Some Jungian symbols surely exist so try your best.
                 - Make sure you the final output does not contain the meaning of symbols but only symbols.
