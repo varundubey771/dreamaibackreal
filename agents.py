@@ -40,7 +40,7 @@ class DreamAnalysisAgents:
             backstory="""As an Expert Jungian Analyst, you are responsible for aggregating all the Jungian symbols from the dream
                 into a list.""",
             llm=self.llm,
-            max_iter = 2,
+            max_iter = 4,
             verbose=True
         )
 
