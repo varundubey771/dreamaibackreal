@@ -1,27 +1,31 @@
 from crewai import Crew, Process
 from agents import DreamAnalysisAgents
 from tasks import DreamAnalysisTasks
+from inMemoryStore import SingletonInMemoryEvents
 class DreamAnalysisCrew:
-    def __init__(self):
+    def __init__(self, jobId):
+        self.jobId = jobId
         self.crew = None
 
     def setup_crew(self, dream):
         agents =  DreamAnalysisAgents()
-        tasks = DreamAnalysisTasks()
+        tasks = DreamAnalysisTasks(self.jobId)
         symbolsAgent = agents.symbolExtarctorAgent(dream)
         symbolExtractionTask = tasks.symbolExtraction(symbolsAgent, dream)
-        webAgent = agents.relevantSymbolMeaningAgent()
-        webDataTask = tasks.getWebData(webAgent, [symbolExtractionTask])
-        writerAgent = agents.finalWriter()
-        writerTask = tasks.writerAgentTask(writerAgent, [webDataTask], dream)
+        meaningAgent = agents.relevantSymbolMeaningAgent()
+        meaningExtractionTask = tasks.getWebData(meaningAgent, [symbolExtractionTask])
+        # summmaryAgent = agents.summaryAgent()
+        # summaryTask = tasks.shortSummaryTask(summmaryAgent, [meaningExtractionTask])
         try:
-            self.crew = Crew(agents=[symbolsAgent, webAgent], tasks=[symbolExtractionTask, webDataTask] ,process=Process.sequential)
+            self.crew = Crew(agents=[symbolsAgent, meaningAgent], tasks=[symbolExtractionTask, meaningExtractionTask] ,process=Process.sequential)
         except Exception as e:
             print("errr", e)
 
     def kickoff(self):
+        inMemoryStore = SingletonInMemoryEvents.getSingleInstance()
         if not self.crew:
             return {"status":"no_crew_present"}
+        inMemoryStore.appendEvent(self.jobId, "crew started")
         try:
             res=self.crew.kickoff()
             print("ressssssssssssssKickOff", res)

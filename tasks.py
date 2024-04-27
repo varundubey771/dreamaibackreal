@@ -1,8 +1,26 @@
 from crewai import Agent, Task
 from textwrap import dedent
-from models import DreamSymbolList, SymbolsUrls
+from models import DreamSymbolList, SymbolsUrls, FinalDreamOutput
 from typing import List
+from inMemoryStore import SingletonInMemoryEvents
+
 class DreamAnalysisTasks:
+    def __init__(self, jobId:str):
+        self.jobId = jobId
+
+    def appendEventCallback(self, taskOutput):
+        inMemoryStore = SingletonInMemoryEvents.getSingleInstance()
+        inMemoryStore.appendEvent(self.jobId, taskOutput.exported_output)
+
+    def appendEventCallbackRaw(self, taskOutput):
+        inMemoryStore = SingletonInMemoryEvents.getSingleInstance()
+        if len(str(taskOutput.exported_output))>50:
+            eventOutput = str(taskOutput.exported_output)
+            eventOutput = eventOutput[:50]+'.....'
+
+        inMemoryStore.appendEvent(self.jobId, eventOutput)
+        inMemoryStore.updateRawAnalysis(self.jobId, taskOutput.exported_output)
+
     def symbolExtraction(self, agent: Agent, dream:str):
         return Task(
             description=dedent(f"""Based on the dream: {dream},
@@ -11,7 +29,8 @@ class DreamAnalysisTasks:
             agent=agent,
             expected_output=dedent(
                 """A json object containing the list of at most 6 symbols in the key symbols"""),
-            output_json=DreamSymbolList
+            output_json=DreamSymbolList,
+            callback=self.appendEventCallback
         )
 
     def getWebUrlsOg(self, agent:Agent, tasks:List[Task]):
@@ -22,19 +41,37 @@ class DreamAnalysisTasks:
             expected_output=dedent(
                 """A json object containing the url for each symbol in the format {"data":{"symbol1":"link1", "symbol2":"link2",...}}"""),
             output_json=SymbolsUrls,
-            context=tasks
+            context=tasks,
+            callback=self.appendEventCallback
         )
 
     def getWebData(self, agent:Agent, tasks:List[Task]):
         return Task(
-            description=dedent(f"""Based on the list of symbols returned from the symbol Extractor Agent, research each symbol on the web and generate an extensive jungian text analysis consisting of references to the symbols.The final article must contain direct quotations by jung and also book references if any. The report has to have extensive text with heavy jungian meanings of symbols fetched from the web. article should contain all the relevant information scraped from the web.
+            description=dedent(f"""Based on the list of symbols returned from the symbol Extractor Agent, research each symbol on the web using the given tool and generate an extensive jungian text analysis consisting of references to the symbols.The final article must contain direct quotations by jung and also book references if any. The report has to have extensive text with heavy jungian meanings of symbols fetched from the web. article should contain all the relevant information scraped from the web.
+            make sure to be careful about the input format of the given tool
             Only use the data you scraped from the internet to interpret the symbols
-            you MUST break the execution in case the serper google api fails to scrape the data and return an empty string"""),
+            you MUST break the execution in case the serper google api fails to scrape the data and return an empty string
+            make sure the final output is very long and covers most of relevant data scraped from the web"""),
             agent=agent,
             context=tasks,
+            callback=self.appendEventCallbackRaw,
             expected_output=dedent(
                 """A huge string containing the meaning for each symbol in paragraphs and also some reference books relevant to the scraped data"""),
-        )
+            )
+
+    def shortSummaryTask(self, agent:Agent, tasks:List[Task]):
+        return Task(
+            description=dedent(f"""Based on the dream analysis received from the relevantSymbolMeaningAgent agent write a short, profound and perspective shifting summary of the dream analysis.
+            it should have also have some suggestions as to the things the dreamer can focus on based on the dream analysis.
+            Only use the data you received from the getWebData Task by relevantSymbolMeaningAgent agent"""),
+            agent=agent,
+            context=tasks,
+            callback=self.appendEventCallback,
+            expected_output=dedent(
+                """A string containing the profound summary of the long dream analysis received by the previous agent"""),
+            )
+
+
     def writerAgentTask(self, agent:Agent, tasks:List[Task], dream:str):
         return Task(
         description=dedent(f"""Write an extensive and deep jungian analysis with text only and at least 10 paragraphs. text should make heavy use of
@@ -44,7 +81,7 @@ class DreamAnalysisTasks:
         """),
         agent=agent,
         context=tasks,
+        callback=self.appendEventCallback,
         expected_output=dedent(
                 """A string containing the full analysis of the dream based on the relevant Jungian symbols present in the dream"""),
         )
-

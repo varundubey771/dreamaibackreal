@@ -6,3 +6,7 @@ class DreamSymbolList(BaseModel):
 
 class SymbolsUrls(BaseModel):
     data: Dict[str, str]
+
+class FinalDreamOutput(BaseModel):
+    longDreamAnalysis:str
+    dreamAnalysisSummary:str
