@@ -48,7 +48,7 @@ class DreamAnalysisTasks:
     def getWebData(self, agent:Agent, tasks:List[Task]):
         return Task(
             description=dedent(f"""Based on the list of symbols returned from the symbol Extractor Agent, research each symbol on the web using the given tool and generate an extensive jungian text analysis consisting of references to the symbols.The final article must contain direct quotations by jung and also book references if any. The report has to have extensive text with heavy jungian meanings of symbols fetched from the web. article should contain all the relevant information scraped from the web.
-            make sure to be careful about the input format of the given tool
+            make sure to be careful about the input format of the given serper web scraping api tool
             Only use the data you scraped from the internet to interpret the symbols
             you MUST break the execution in case the serper google api fails to scrape the data and return an empty string"""),
             agent=agent,
