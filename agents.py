@@ -50,7 +50,6 @@ class DreamAnalysisAgents:
             goal=f"""Write an extensive article using all the scraped data for all symbols from the web
                 Important:
                 - Use the web scraping api with correct input formats
-                - Make sure the final output is very long and includes most of the relevant data scraped from web
                 - The article must include direct quotations by jung and also book references if any
                 - The article should cover most of the scraped data related to the symbols and also references to books mentioned in the scraped data
                 - The final text must reference as many symbols as possible scraped from the web.
