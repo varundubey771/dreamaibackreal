@@ -14,8 +14,12 @@ os.getenv("SERPER_API_KEY")
 
 
 class DreamAnalysisAgents:
-    def __init__(self):
-        self.llm = ChatGroq(temperature=0, groq_api_key=os.getenv('GROQ_API_KEY'))
+    def __init__(self, model:str):
+        if model=='chatgpt':
+            self.llm = ChatOpenAI(model = "gpt-3.5-turbo")
+        else:
+            self.llm = ChatGroq(temperature=0, groq_api_key=os.getenv('GROQ_API_KEY'))
+
         #self.searchInternetTool = SerperDevTool()
         serperInstance = GoogleSerperAPIWrapper()
         search_tool = Tool(
@@ -40,8 +44,9 @@ class DreamAnalysisAgents:
             backstory="""As an Expert Jungian Analyst, you are responsible for aggregating all the Jungian symbols from the dream
                 into a list.""",
             llm=self.llm,
-            max_iter = 4,
-            verbose=True
+            max_iter = 2,
+            verbose=True,
+              allow_delegation=False
         )
 
     def relevantSymbolMeaningAgent(self) -> Agent:
@@ -49,8 +54,8 @@ class DreamAnalysisAgents:
             role="Jungian Symbols Indentification Expert",
             goal=f"""Write an extensive article using all the scraped data for all symbols from the web
                 Important:
-                - Make sure to use the web scraping serper api with correct input formats
-                - The article must include direct quotations by jung and also book references if any
+                - Make sure that GoogleSerperAPIWrapper.run() takes 2 positional arguments only
+                - The article MUST include direct quotations by jung and also book references if any
                 - The article should cover most of the scraped data related to the symbols and also references to books mentioned in the scraped data
                 - The final text must reference as many symbols as possible scraped from the web.
                 - Do not generate fake information. Only return the information you find from the web. Nothing else!
@@ -62,7 +67,8 @@ class DreamAnalysisAgents:
             tools=[self.searchInternetTool],
             llm=self.llm,
             max_iter = 4,
-            verbose=True
+            verbose=True,
+             allow_delegation=False
         )
     def summaryAgent(self)->Agent:
         return Agent(
@@ -71,7 +77,8 @@ class DreamAnalysisAgents:
             backstory="""You are an Expert Jungian summarizer, a summarizer of a few wise words, your writing is especially reminiscent of jung himself. ONLY use dream analysis received by the previous task for summarizing and nothing else!""",
             verbose=True,
             llm = self.llm,
-            max_iter = 2
+            max_iter = 2,
+              allow_delegation=False
         )
 
     def finalWriter(self)->Agent:

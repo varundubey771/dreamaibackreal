@@ -6,6 +6,9 @@ from threading import Thread
 from uuid import uuid4
 from inMemoryStore import SingletonInMemoryEvents, Event
 from flask_cors import CORS, cross_origin
+from db import SingleDb
+from functools import wraps
+
 
 app = Flask('dreamAgent')
 CORS(app)
@@ -28,6 +31,68 @@ def kickoffCrew(jobId:str, dream:str):
     inMemoryStore.appendEvent(jobId, 'COMPLETE')
     print(jobId)
 
+def kickoffCrewPremium(jobId:str, dream:str):
+    inMemoryStore = SingletonInMemoryEvents.getSingleInstance()
+    res = None
+    try:
+        dreamAnalysisCrew = DreamAnalysisCrew(jobId, 'chatgpt')
+        dreamAnalysisCrew.setup_crew(dream)
+        res = dreamAnalysisCrew.kickoff()
+    except Exception as e:
+        inMemoryStore.appendEvent(jobId, 'event crew kickoff failed')
+        inMemoryStore.updateJobStatus(jobId, 'ERROR')
+        inMemoryStore.updateJobAnalysisSummary(jobId, str(e))
+        print(str(e))
+        return {"status":"failed"}
+    print("@#################################", res, type(res))
+    inMemoryStore.updateJobStatus(jobId, 'COMPLETE')
+    inMemoryStore.updateJobAnalysisSummary(jobId, res)
+    inMemoryStore.appendEvent(jobId, 'COMPLETE')
+    print(jobId)
+
+def authDecoParams(reqType='GET'):
+    def authDecorator(func):
+        print("lmaolmaolmaolmao",reqType)
+        @wraps(func)
+        def decorator(*args, **kwargs):
+            if reqType=='GET':
+                userId = request.args.get('req')
+            elif reqType=='POST':
+                reqData = request.json
+                if not 'currentUserId' in reqData:
+                    return {"status":"unauthorized"}
+                userId = reqData['currentUserId']
+            else:
+                return {"status":"invalid_method"}
+            print(userId)
+            supabase = SingleDb.getInstance()
+            res = supabase.table('UserTier').select('tier').filter('clerkId', 'eq', userId).execute()
+            print("#############################",res)
+            try:
+                data = res.data
+                if data and data[0]['tier']!='admin':
+                    return {"status":"unauthorized"}
+                return func(*args, **kwargs)
+            except:
+                return {'status':'auth_err'}
+        return decorator
+    return authDecorator
+
+@app.route('/api/startsuperanalysis', methods=['POST'])
+@authDecoParams('POST')
+def startSuperAnalysis():
+    data = request.json
+    if 'dreamWithContext' not in data or len(data['dreamWithContext'])==0:
+        return {"status": "empty dream"}
+    dream = data['dreamWithContext']
+    jobId = str(uuid4())
+    t = Thread(target=kickoffCrew, args=(jobId, dream))
+    try:
+        t.start()
+    except Exception as e:
+        print(str(e))
+        return {"status":"failed"}
+    return jsonify({'jobId':jobId})
 
 @app.route('/api/startanalysis', methods=['POST'])
 def startAnalysis():
@@ -36,7 +101,7 @@ def startAnalysis():
         return {"status": "empty dream"}
     dream = data['dreamWithContext']
     jobId = str(uuid4())
-    t = Thread(target=kickoffCrew, args=(jobId, dream))
+    t = Thread(target=kickoffCrewPremium, args=(jobId, dream))
     try:
         t.start()
     except Exception as e:
@@ -97,4 +162,4 @@ obj
     return {"analysis":chat_completion.choices[0].message.content}
 
 if __name__=='__main__':
-    app.run(debug=True, port=8001)
+    app.run(debug=True, port=8000)

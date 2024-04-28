@@ -30,7 +30,8 @@ class DreamAnalysisTasks:
             expected_output=dedent(
                 """A json object containing the list of 3 most symbols in the key symbols"""),
             output_json=DreamSymbolList,
-            callback=self.appendEventCallback
+            callback=self.appendEventCallback,
+            allow_delegation=False
         )
 
     def getWebUrlsOg(self, agent:Agent, tasks:List[Task]):
@@ -47,16 +48,19 @@ class DreamAnalysisTasks:
 
     def getWebData(self, agent:Agent, tasks:List[Task]):
         return Task(
-            description=dedent(f"""Based on the list of symbols returned from the symbol Extractor Agent, research each symbol on the web using the given tool and generate an extensive jungian text analysis consisting of references to the symbols.The final article must contain direct quotations by jung and also book references if any. The report has to have extensive text with heavy jungian meanings of symbols fetched from the web. article should contain all the relevant information scraped from the web.
-            make sure to be careful about the input format of the given serper web scraping api tool
+            description=dedent(f"""Based on the list of symbols returned from the symbol Extractor Agent, research each symbol on the web using the given tool and generate an extensive jungian text analysis consisting of references to the symbols.The final article must contain direct quotations by jung and also book references if any. The report has to be an extremely long text with heavy jungian meanings of symbols fetched from the web. article should contain all the relevant information scraped from the web.
+            Make sure that GoogleSerperAPIWrapper.run() takes 2 positional arguments only
+            Make sure the final reponse is extremely long and includes most of the raw data scraped from the web
             Only use the data you scraped from the internet to interpret the symbols
             you MUST break the execution in case the serper google api fails to scrape the data and return an empty string"""),
             agent=agent,
             context=tasks,
             callback=self.appendEventCallbackRaw,
+            allow_delegation=False,
             expected_output=dedent(
                 """A huge string containing the meaning for each symbol in paragraphs and also some reference books relevant to the scraped data"""),
             )
+
 
     def shortSummaryTask(self, agent:Agent, tasks:List[Task]):
         return Task(

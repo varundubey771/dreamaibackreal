@@ -3,12 +3,14 @@ from agents import DreamAnalysisAgents
 from tasks import DreamAnalysisTasks
 from inMemoryStore import SingletonInMemoryEvents
 class DreamAnalysisCrew:
-    def __init__(self, jobId):
+    def __init__(self, jobId, model='groq'):
+        print("mdomodemodemodemodmeodmeomdoedmomdoel", model)
         self.jobId = jobId
         self.crew = None
+        self.model=model
 
     def setup_crew(self, dream):
-        agents =  DreamAnalysisAgents()
+        agents =  DreamAnalysisAgents(self.model)
         tasks = DreamAnalysisTasks(self.jobId)
         symbolsAgent = agents.symbolExtarctorAgent(dream)
         symbolExtractionTask = tasks.symbolExtraction(symbolsAgent, dream)
