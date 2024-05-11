@@ -39,8 +39,8 @@ class SymbolInterpreter:
                 items = extracted_list.split(',')
                 # Stripping extra spaces and quotes from each item
                 items = [item.strip(' " ') for item in items]
-                if len(items)>4:
-                    items = items[:4]
+                if len(items)>2:
+                    items = items[:2]
                 return items
             else:
                 print("No list found in the string.")
