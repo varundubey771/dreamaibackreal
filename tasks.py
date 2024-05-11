@@ -30,8 +30,7 @@ class DreamAnalysisTasks:
             expected_output=dedent(
                 """A json object containing the list of 3 most symbols in the key symbols"""),
             output_json=DreamSymbolList,
-            callback=self.appendEventCallback,
-            allow_delegation=False
+            callback=self.appendEventCallback
         )
 
     def getWebUrlsOg(self, agent:Agent, tasks:List[Task]):
@@ -56,11 +55,10 @@ class DreamAnalysisTasks:
             agent=agent,
             context=tasks,
             callback=self.appendEventCallbackRaw,
-            allow_delegation=False,
             expected_output=dedent(
                 """A huge string containing the meaning for each symbol in paragraphs and also some reference books relevant to the scraped data"""),
             )
-
+            
 
     def shortSummaryTask(self, agent:Agent, tasks:List[Task]):
         return Task(
