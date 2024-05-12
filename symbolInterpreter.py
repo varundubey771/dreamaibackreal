@@ -14,13 +14,15 @@ import re
 import json
 import requests
 import bs4
+from singletonGroq import SingleGroq
 
 class SymbolInterpreter:
     def __init__(self):
         self.kvInstance = SingletonJobsKv.getInstance()
-        self.groqClient = Groq(
-        api_key=os.environ.get("GROQ_API_KEY"),
-        )
+        # self.groqClient = Groq(
+        # api_key=os.environ.get("GROQ_API_KEY"),
+        # )
+        self.groqClient = SingleGroq.getInstance()
         self.serperHeaders = {
         'X-API-KEY': 'a88471bb323dabc70364da234a1f0f6cdec01aac',
         'Content-Type': 'application/json'
@@ -52,8 +54,8 @@ class SymbolInterpreter:
         try:
             obj = {
                 "role": "user",
-                "content": f'''{self.rawDream} extract the relevant jungian symbols from the above dream and return an array list containing only symbols, in the following
-                output format: ["symbol1", "symbol2", "symbol3"],  IMPORTANT: each symbol in the symbols array must be one word only, make sure to only respond with an array containing symbols in the given format, also make sure each symbol in the output array must be sorted based on jungian relevance, also include different symbols which dont have much overlap in meaning with each other''',
+                "content": f'''{self.rawDream} extract the relevant google search prompts for jungian dream analysis from the above dream and return an array list containing the search prompts, in the following
+                output format: ["search 1", "search 2", "search 3"],  IMPORTANT: each search must contribute to jungian analysis of the dream, make sure to only respond with an array containing searches in the given format, also make sure each symbol in the output array must be sorted based on jungian relevance, also include different searches which dont have much overlap in meaning with each other''',
             }
             chat_completion = self.groqClient.chat.completions.create(
                 messages=[obj],
@@ -70,7 +72,7 @@ class SymbolInterpreter:
 
     def extractSymbolLink(self, symbol):
         payload = json.dumps({
-        "q": f'''jungian interpretation {symbol}'''
+        "q": f'''{symbol}'''
         })
         response = requests.request("POST", self.serperUrl, headers=self.serperHeaders, data=payload)
         with self.kvInstance.getLock():

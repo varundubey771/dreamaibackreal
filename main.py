@@ -12,6 +12,7 @@ import re
 import bs4, requests
 import json
 from symbolInterpreter import SymbolInterpreter
+from contextRetriever import ContextRetriever
 
 
 
@@ -241,6 +242,8 @@ def getlinks():
     return data
 
 
+
+
 @app.route('/api/startinterpretation', methods=['POST'])
 def startInterpretation():
     data = request.json
@@ -257,6 +260,22 @@ def startInterpretation():
         print(str(e))
         return {"status":"failed"}
     return jsonify({'jobId':jobId})
+
+@app.route('/api/fetchdreamcontext', methods=['POST'])
+def fetchDreamContext():
+    data = request.json
+    if 'dream' not in data or len(data['dream'])==0:
+        return {"status": "empty dream"}
+    print("apapapapapapappapapa!!!!!!!!!!!!!!!!!!!!!!",  data['dream'])
+    #dream = "I went to a mountain with my extended family and we climbed it in excitement without thinking much, once we reached the top we realised that we arent skilled enough to get down as it was very steep, on the mountain i realised that i can also fly and somehow i flew and reached a marshy land where i feared the snakes, luckily i survived"
+
+    try:
+        obj = ContextRetriever(data['dream'])
+        resp = obj.getRelevantQuestions()
+    except Exception as e:
+        print(str(e))
+        return {"status":"failed"}
+    return jsonify({'questions':resp})
 
 @app.route('/api/checkinterpretation', methods=['GET'])
 def checkInterpretation():
