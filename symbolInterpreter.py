@@ -93,10 +93,11 @@ class SymbolInterpreter:
         return {"status":"linkNotFound"}
 
     def paraphraseInterpretation(self, rawInterpretation, symbol):
+
         try:
             obj={
                         "role": "user",
-                        "content": f'''{rawInterpretation} Task: retrieve all the relevant info and use direct quotations for expanding on the {symbol} symbol in a jungian context, there should not be a single mention of the article the text being retrived from an article or a blog or from the web''',
+                        "content": f'''{rawInterpretation} Task: retrieve all the relevant info and use direct quotations for expanding on the {symbol} symbol in a jungian context, use the following and dream and context to relate the interpretation to the dream in a jungian style: {self.rawDream}''',
                     }
             chat_completion = self.groqClient.chat.completions.create(
                 messages=[obj],
