@@ -54,8 +54,8 @@ class SymbolInterpreter:
         try:
             obj = {
                 "role": "user",
-                "content": f'''{self.rawDream} extract the relevant google search prompts for jungian dream analysis from the above dream and return an array list containing the search prompts, in the following
-                output format: ["search 1", "search 2", "search 3"],  IMPORTANT: each search must contribute to jungian analysis of the dream, make sure to only respond with an array containing searches in the given format, also make sure each symbol in the output array must be sorted based on jungian relevance, also include different searches which dont have much overlap in meaning with each other''',
+                "content": f'''{self.rawDream} extract the relevant google search prompts based on different jungian symbols occuring in the dream above for jungian dream analysis and return an array list containing the search prompts, in the following
+                output format: ["search prompt 1", "search prompt 2", "search prompt 3"],  IMPORTANT: each search must contribute to jungian analysis of the dream, make sure to only respond with a single array containing searche prompts in the given format, also make sure each prompt in the output array must be sorted based on jungian relevance, also include different searche prompts which dont have much overlap in meaning with each other''',
             }
             chat_completion = self.groqClient.chat.completions.create(
                 messages=[obj],
@@ -97,7 +97,7 @@ class SymbolInterpreter:
         try:
             obj={
                         "role": "user",
-                        "content": f'''{rawInterpretation} Task: retrieve all the relevant info and use direct quotations for expanding on the {symbol} symbol in a jungian context, use the following and dream and context to relate the interpretation to the dream in a jungian style: {self.rawDream}''',
+                        "content": f'''{rawInterpretation}  Symbol: {symbol} Task: retrieve all the relevant info and use direct quotations for relating the given interpretation above with the following dream, {self.rawDream}    IMPORTANT: ONLY USE THE INTERPRETATION PROVIDED ABOVE TO INTERPRET THE DREAM IN A JUNGIAN STYLE AND NOTHING ELSE, MAKE SURE TO USE DIRECT QUOTATIONS BY JUNG GIVEN IN THE INTERPRETATION''',
                     }
             chat_completion = self.groqClient.chat.completions.create(
                 messages=[obj],

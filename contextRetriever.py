@@ -9,7 +9,7 @@ class ContextRetriever:
         try:
             obj = {
                 "role": "user",
-                "content": f'''{self.dream} ask the dreamer personal and relevant jungian questions in the context of the dream. ask questions which might be useful in further jungian analysis of the dream, only ask 3 to 4 questions''',
+                "content": f'''{self.dream} ask the dreamer concise, personal and relevant jungian questions to retrieve more context for the dream. ask questions which might be useful to extract relevant context for jungian analysis of the dream, only ask 3 to 4 questions''',
             }
             chat_completion = self.groqClient.chat.completions.create(
                 messages=[obj],
