@@ -161,7 +161,7 @@ output format: "symbols":["symbol1", "symbol2", "symbol3"], make sure to only re
         messages=[
 obj
         ],
-        model="mixtral-8x7b-32768",
+        model="llama-3.3-70b-versatile",
     )
 
 
@@ -203,7 +203,7 @@ def getscraped():
         messages=[
 obj
         ],
-        model="mixtral-8x7b-32768",
+        model="llama-3.3-70b-versatile",
     )
     return {"lol":chat_completion.choices[0].message.content}
 

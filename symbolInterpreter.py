@@ -59,7 +59,7 @@ class SymbolInterpreter:
             }
             chat_completion = self.groqClient.chat.completions.create(
                 messages=[obj],
-                model="mixtral-8x7b-32768",
+                model="llama-3.3-70b-versatile",
             )
             with self.kvInstance.getLock():
                 event = self.kvInstance.appendCosting(self.jobId, {"category":"groqApi", "cost":0, "calls":1, "groqUsage":chat_completion.usage.model_dump_json()})
@@ -101,7 +101,7 @@ class SymbolInterpreter:
                     }
             chat_completion = self.groqClient.chat.completions.create(
                 messages=[obj],
-                model="mixtral-8x7b-32768",
+                model="llama-3.3-70b-versatile",
             )
             with self.kvInstance.getLock():
                 event = self.kvInstance.appendCosting(self.jobId,{"category":"groqApi", "cost":0, "calls":1, "groqUsage":chat_completion.usage.model_dump_json()})
